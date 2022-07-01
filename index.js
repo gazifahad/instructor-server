@@ -11,6 +11,12 @@ const app = express();
 // middleware
 app.use(cors());
 app.use(express.json());
+const verifyToken=(req,res,next)=>{
+  const authHeader =req.headers.authorization; 
+  if(!authHeader){
+    res.status(401).send('unauthorized')
+  }
+}
 
 // const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.adkux.mongodb.net/?retryWrites=true&w=majority`;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dbg5s.mongodb.net/?retryWrites=true&w=majority`;
@@ -35,7 +41,7 @@ async function run() {
             
             if(result){
                 let accessToken=jwt.sign({Email:email},process.env.ACCESS_TOKEN_SECRET,{
-                    expiresIn:'1d'
+                    expiresIn:'12h'
                 });
                 res.send({result,accessToken:accessToken})
             }
@@ -45,6 +51,7 @@ async function run() {
 
         })
         app.get('/api/billing-list', async (req, res) => {
+            // console.log(req.headers.authorization);
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
             const query = {};
